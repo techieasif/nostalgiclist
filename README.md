@@ -56,6 +56,23 @@ These are all verified empirically — none are documented by Google.
 Both can still be deep-linked per song via the keyless iTunes Search API — that's the v1 plan.
 Full analysis in [`research/FEASIBILITY.md`](research/FEASIBILITY.md).
 
+## Deploy (Vercel)
+
+The Next.js app lives in `app/`, not the repo root, so Vercel needs one setting:
+
+> **Project → Settings → Build & Deployment → Root Directory → `app`**
+
+With that set, Vercel auto-detects Next.js and everything else is default. No environment
+variables are needed — there are no API keys anywhere in this project.
+
+Two things to know about it on serverless:
+
+- The playlist route's day-cache is an in-memory `Map`, so it resets on every cold start. That
+  costs an extra `watch_videos` round-trip, nothing more. Move it to Vercel KV if it matters.
+- `app/data/catalog.json` is a build-time snapshot. Re-run `python3 research/build_catalog.py`
+  and commit the result to refresh the songs; nothing is fetched from the source sites at
+  request time.
+
 ## Credit
 
 Every site here was made by someone else, on their own time, in the space of about a week.
