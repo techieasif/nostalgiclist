@@ -58,8 +58,13 @@ Full analysis in [`research/FEASIBILITY.md`](research/FEASIBILITY.md).
 
 ## Deploy (Vercel)
 
-Zero config — the Next.js app is at the repo root, so Vercel auto-detects it. Root Directory
-stays `./`. No environment variables: there are no API keys anywhere in this project.
+The app is at the repo root and `vercel.json` pins `"framework": "nextjs"`, so no dashboard
+configuration is needed. Root Directory stays `./`. No environment variables — there are no API
+keys anywhere in this project.
+
+If you ever see *"No Output Directory named `public` found after the Build completed"*, it means
+the project's Framework Preset reverted to **Other**: Vercel runs the Next build successfully and
+then looks for a static site. The `vercel.json` above is what prevents that.
 
 Two things to know about it on serverless:
 
