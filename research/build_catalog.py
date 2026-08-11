@@ -7,7 +7,7 @@ For each site in the trend, extract a validated tracklist using only keyless end
   T2  YouTube playlist scrape                        (youtube.com/playlist?list=<id> -> "videoId")
   ..  oEmbed validation                              (kills false positives, yields title + channel)
 
-Output: ../app/data/catalog.json
+Output: ../data/catalog.json
 """
 import re, json, os, sys, urllib.request, urllib.parse, concurrent.futures as cf
 
@@ -178,8 +178,8 @@ if __name__ == "__main__":
         unique.append(r)
     out = unique
     out.sort(key=lambda r: -len(r["tracks"]))
-    dest = os.path.join(here, "..", "app", "data")
+    dest = os.path.join(here, "..", "data")
     os.makedirs(dest, exist_ok=True)
     with open(os.path.join(dest, "catalog.json"), "w") as f:
         json.dump({"generated": "2026-08-11", "sites": out}, f, indent=1, ensure_ascii=False)
-    print(f"\n{len(out)} sites, {sum(len(r['tracks']) for r in out)} validated tracks -> app/data/catalog.json")
+    print(f"\n{len(out)} sites, {sum(len(r['tracks']) for r in out)} validated tracks -> data/catalog.json")

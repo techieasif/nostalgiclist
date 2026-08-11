@@ -7,7 +7,7 @@ playlist on your phone**, with no login and no API key.
 18 sites · 549 validated songs.
 
 ```bash
-cd app && npm install && npm run dev     # http://localhost:3311
+npm install && npm run dev     # http://localhost:3311
 ```
 
 ## How it works
@@ -24,7 +24,7 @@ using only keyless endpoints:
 Every candidate id is then validated through **YouTube oEmbed** (keyless, no Data API quota),
 which both filters false positives and returns the title and channel for free.
 
-**Playlist building** (`app/app/api/playlist/route.ts`) posts the ids to YouTube's undocumented
+**Playlist building** (`app/api/playlist/route.ts`) posts the ids to YouTube's undocumented
 `watch_videos` endpoint and reads the playlist id out of the redirect. No OAuth, no quota, no
 Google Cloud project.
 
@@ -58,18 +58,14 @@ Full analysis in [`research/FEASIBILITY.md`](research/FEASIBILITY.md).
 
 ## Deploy (Vercel)
 
-The Next.js app lives in `app/`, not the repo root, so Vercel needs one setting:
-
-> **Project → Settings → Build & Deployment → Root Directory → `app`**
-
-With that set, Vercel auto-detects Next.js and everything else is default. No environment
-variables are needed — there are no API keys anywhere in this project.
+Zero config — the Next.js app is at the repo root, so Vercel auto-detects it. Root Directory
+stays `./`. No environment variables: there are no API keys anywhere in this project.
 
 Two things to know about it on serverless:
 
 - The playlist route's day-cache is an in-memory `Map`, so it resets on every cold start. That
   costs an extra `watch_videos` round-trip, nothing more. Move it to Vercel KV if it matters.
-- `app/data/catalog.json` is a build-time snapshot. Re-run `python3 research/build_catalog.py`
+- `data/catalog.json` is a build-time snapshot. Re-run `python3 research/build_catalog.py`
   and commit the result to refresh the songs; nothing is fetched from the source sites at
   request time.
 
@@ -81,11 +77,11 @@ Each card links to the original — go tell them.
 ## Layout
 
 ```
-app/                     Next.js 15 app
-  app/page.tsx           directory
-  app/SiteCard.tsx       per-site card + build button
-  app/api/playlist/      watch_videos resolver (50-chunk, daily cache)
-  data/catalog.json      generated — do not hand-edit
+app/                     Next.js App Router
+  page.tsx               directory
+  SiteCard.tsx           per-site card + build button
+  api/playlist/          watch_videos resolver (50-chunk, daily cache)
+data/catalog.json        generated — do not hand-edit
 research/
   build_catalog.py       the extractor that generates catalog.json
   FEASIBILITY.md         platform-by-platform analysis

@@ -5,7 +5,6 @@
       "name": "nostalgiclist",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "app",
       "port": 3311
     }
   ]
