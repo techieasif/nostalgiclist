@@ -86,6 +86,24 @@ Two things to know about it on serverless:
   and commit the result to refresh the songs; nothing is fetched from the source sites at
   request time.
 
+## Analytics
+
+[Vercel Web Analytics](https://vercel.com/docs/analytics) — cookieless, no PII, so no consent
+banner is required. Two things are measured:
+
+- **page views**, via `<Analytics />` in `app/layout.tsx`
+- **`playlist_built`**, fired server-side from the API route with `site`, `songs` and
+  `hasYouTubeMusic`. Server-side on purpose: ad blockers eat client-side events, and this is the
+  only number that says whether the product works rather than just gets looked at.
+
+It has to be switched on once in the dashboard — **Project → Analytics → Enable**. Nothing is
+collected until you do.
+
+**The Hobby cap is 50,000 events/month**, and a page view is an event. If the launch lands, that
+can go quickly. It fails safe: collection *pauses* until the next cycle rather than billing you,
+and Hobby can't buy more. The site keeps working either way — analytics never blocks a playlist
+build (the `track()` call is wrapped in try/catch).
+
 ## Credit
 
 Every site here was made by someone else, on their own time, in the space of about a week.

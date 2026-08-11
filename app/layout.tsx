@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const SITE = "https://nostalgiclist.vercel.app";
@@ -40,6 +41,8 @@ export default function RootLayout({
       <body>
         <div className="garland" aria-hidden="true" />
         {children}
+        {/* cookieless + no PII, so this needs no consent banner */}
+        <Analytics />
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { track } from "@vercel/analytics/server";
 import catalog from "@/data/catalog.json";
 
 export const runtime = "nodejs";
@@ -61,6 +62,20 @@ export async function GET(req: NextRequest) {
       );
     }
     cache.set(host, { id: listId, day });
+
+    // The number worth knowing: how many playlists actually get built, and for which
+    // sites. Counted server-side so ad blockers don't skew it. Never let analytics
+    // break the thing the user asked for.
+    try {
+      await track("playlist_built", {
+        site: host,
+        songs: Math.min(site.tracks.length, MAX_IDS),
+        hasYouTubeMusic: Boolean(site.ytmPlaylist),
+      });
+    } catch {
+      /* analytics is best-effort */
+    }
+
     return NextResponse.json({ ...build(listId, site), cached: false });
   } catch (e: any) {
     return NextResponse.json({ error: "fetch_failed", detail: String(e) }, { status: 502 });

@@ -33,7 +33,7 @@ The catch with all these desi nostalgia sites: the songs only live in that tab.
 
 So I collected 18 of them and gave each one a button that builds a real YouTube Music playlist.
 
-549 songs. No login, no API key, nothing stored.
+549 songs. No login, no account, no cookies.
 
 nostalgiclist.vercel.app
 ```
