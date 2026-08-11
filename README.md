@@ -96,8 +96,13 @@ banner is required. Two things are measured:
   `hasYouTubeMusic`. Server-side on purpose: ad blockers eat client-side events, and this is the
   only number that says whether the product works rather than just gets looked at.
 
-It has to be switched on once in the dashboard — **Project → Analytics → Enable**. Nothing is
-collected until you do.
+Confirmed recording on the live site — a page load fires `POST …/view → 200`. If the dashboard
+shows nothing, switch it on under **Project → Analytics → Enable**.
+
+Don't look for `/_vercel/insights/` in the HTML to check whether it's working: Vercel **randomises
+the collector path per project** (here it's `/11a790f7897df606/`) so ad blockers can't pattern-match
+it, and the script is injected client-side rather than server-rendered. Grepping the served HTML
+gives a false negative. Check the network tab for a `POST` to `…/view` instead.
 
 **The Hobby cap is 50,000 events/month**, and a page view is an event. If the launch lands, that
 can go quickly. It fails safe: collection *pauses* until the next cycle rather than billing you,
