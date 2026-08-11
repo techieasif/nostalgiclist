@@ -92,9 +92,12 @@ Two things to know about it on serverless:
 banner is required. Two things are measured:
 
 - **page views**, via `<Analytics />` in `app/layout.tsx`
-- **`playlist_built`**, fired server-side from the API route with `site`, `songs` and
-  `hasYouTubeMusic`. Server-side on purpose: ad blockers eat client-side events, and this is the
-  only number that says whether the product works rather than just gets looked at.
+- **`playlist_built`** — how many playlists actually get built, and for which sites. Recorded
+  twice, because the good version costs money:
+  - a **structured log line** (`{"event":"playlist_built","site":…}`) — free on Hobby. Read it
+    under **Vercel → Logs**, filtering for `playlist_built`.
+  - a **Web Analytics custom event** — **Pro only.** On Hobby the Events panel reads "No custom
+    events" and the `track()` call is a no-op. It's left in so it starts working on upgrade.
 
 Confirmed recording on the live site — a page load fires `POST …/view → 200`. If the dashboard
 shows nothing, switch it on under **Project → Analytics → Enable**.
@@ -108,6 +111,9 @@ gives a false negative. Check the network tab for a `POST` to `…/view` instead
 can go quickly. It fails safe: collection *pauses* until the next cycle rather than billing you,
 and Hobby can't buy more. The site keeps working either way — analytics never blocks a playlist
 build (the `track()` call is wrapped in try/catch).
+
+Verified working on 2026-08-11: page views, countries, devices and browsers all populate. Custom
+events do not, and won't until Pro.
 
 ## Credit
 

@@ -64,16 +64,30 @@ export async function GET(req: NextRequest) {
     cache.set(host, { id: listId, day });
 
     // The number worth knowing: how many playlists actually get built, and for which
-    // sites. Counted server-side so ad blockers don't skew it. Never let analytics
-    // break the thing the user asked for.
+    // sites. Recorded two ways, because the good one costs money:
+    //
+    //  1. a structured log line — free on Hobby. Vercel → Logs, filter `playlist_built`.
+    //  2. a Web Analytics custom event — ONLY records on Pro. On Hobby the dashboard
+    //     shows "No custom events" and this is a no-op. Left in so it starts working
+    //     the moment the project upgrades.
+    //
+    // Neither may break the thing the user actually asked for.
+    const detail = {
+      event: "playlist_built",
+      site: host,
+      songs: Math.min(site.tracks.length, MAX_IDS),
+      hasYouTubeMusic: Boolean(site.ytmPlaylist),
+    };
+    console.log(JSON.stringify(detail));
+
     try {
       await track("playlist_built", {
-        site: host,
-        songs: Math.min(site.tracks.length, MAX_IDS),
-        hasYouTubeMusic: Boolean(site.ytmPlaylist),
+        site: detail.site,
+        songs: detail.songs,
+        hasYouTubeMusic: detail.hasYouTubeMusic,
       });
     } catch {
-      /* analytics is best-effort */
+      /* best-effort; no-op on Hobby */
     }
 
     return NextResponse.json({ ...build(listId, site), cached: false });
