@@ -47,6 +47,18 @@ These are all verified empirically — none are documented by Google.
   fine. HTTP status is 200 either way, so *assert on content, not status*. The YT Music button
   therefore appears only for the 12 sites that publish their own `PL` playlist; all 12 verified.
 
+## On a phone
+
+The playlist links are plain `https://` URLs to `music.youtube.com` and `www.youtube.com`, which
+are claimed by the YouTube Music and YouTube apps as Android App Links / iOS Universal Links — so
+tapping one opens the app when it's installed, and the web player when it isn't.
+
+The catch, and the reason the buttons look the way they do: **`target="_blank"` breaks this.**
+iOS will not resolve a Universal Link opened via `window.open` or a new tab; it silently falls
+back to the web page. So the result buttons navigate in the *same tab* on touch devices and only
+open a new tab on desktop (`SiteCard.tsx`). Layout is single-column under 700px with every tap
+target at 44px or larger.
+
 ## Why only YouTube
 
 - **Spotify** caps apps created today at **5 users**, and the app owner must hold Premium.

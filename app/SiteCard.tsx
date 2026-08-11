@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Track = { id: string; title: string; channel?: string };
 export type Site = {
@@ -26,6 +26,22 @@ export default function SiteCard({ site }: { site: Site }) {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [onPhone, setOnPhone] = useState(false);
+
+  // On a phone these are https App Links / Universal Links: youtube.com is claimed by the
+  // YouTube app and music.youtube.com by YouTube Music, so a plain same-tab navigation hands
+  // off to the installed app. Opening in a NEW TAB defeats that — iOS in particular will not
+  // resolve a Universal Link from window.open/target=_blank and just renders the web page.
+  // So: same tab on touch devices, new tab on desktop.
+  useEffect(() => {
+    setOnPhone(
+      window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 820
+    );
+  }, []);
+
+  const linkProps = onPhone
+    ? {}
+    : { target: "_blank", rel: "noopener noreferrer" as const };
 
   async function build() {
     setBusy(true);
@@ -89,19 +105,18 @@ export default function SiteCard({ site }: { site: Site }) {
         <div className="result">
           <strong>{res.count} songs</strong> queued up and ready.
           <div className="row">
-            <a className="btn go" href={res.youtube} target="_blank" rel="noopener noreferrer">
-              ▶ YouTube
-            </a>
             {res.youtubeMusic && (
-              <a
-                className="btn"
-                href={res.youtubeMusic}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a className="btn go" href={res.youtubeMusic} {...linkProps}>
                 ♪ YouTube Music
               </a>
             )}
+            <a
+              className={res.youtubeMusic ? "btn" : "btn go"}
+              href={res.youtube}
+              {...linkProps}
+            >
+              ▶ YouTube
+            </a>
           </div>
           {res.truncated && (
             <p className="note">
@@ -109,9 +124,10 @@ export default function SiteCard({ site }: { site: Site }) {
             </p>
           )}
           <p className="note">
+            {onPhone ? "Opens in the app if you have it. " : ""}
             {res.youtubeMusic
-              ? "No login needed. The YouTube link is fresh today; the Music link is this site’s own playlist."
-              : "No login needed. This link is fresh today — rebuild it tomorrow. (No YouTube Music version: this site doesn’t publish a playlist, and YT Music can’t open temporary ones.)"}
+              ? "No login needed."
+              : "No login needed. No YouTube Music version — this site doesn’t publish a playlist, and YT Music can’t open temporary ones."}
           </p>
         </div>
       )}

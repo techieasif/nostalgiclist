@@ -508,6 +508,49 @@ body::before {
   .facts-dots button.on { background: var(--marigold); }
 }
 
+/* ---------------- phones ---------------- */
+
+@media (max-width: 700px) {
+  .wrap { padding: 0 14px 64px; }
+
+  .hero { padding: 28px 6px 20px; }
+  .hero .devanagari { font-size: 13px; letter-spacing: .26em; }
+  .hero .tag { font-size: 15.5px; margin-top: 15px; }
+
+  .divider { margin: 22px 0 24px; }
+
+  .grid { grid-template-columns: 1fr; gap: 16px; }
+
+  .card { padding: 16px 15px 15px; }
+  .card h2 { font-size: 20px; }
+  .card .blurb { min-height: 0; margin-bottom: 11px; }
+
+  /* full-width, thumb-sized actions */
+  .actions { gap: 8px; }
+  .actions .btn { flex: 1 1 auto; justify-content: center; }
+
+  .result .row { gap: 8px; }
+  .result .row .btn { flex: 1 1 100%; justify-content: center; }
+
+  .tracks { max-height: 260px; }
+
+  .facts { padding: 14px 15px 13px; border-radius: 8px; }
+  .facts-slide h3 { font-size: 18px; }
+  .facts-slide p { font-size: 14px; }
+  .facts-foot { flex-direction: column; align-items: stretch; gap: 11px; }
+  .facts-nav { justify-content: center; }
+  .facts-dots { justify-content: center; }
+}
+
+/* every tap target clears the 44px minimum on touch devices */
+@media (pointer: coarse) {
+  .btn { min-height: 44px; padding: 11px 16px; font-size: 14px; }
+  .facts-btn { min-height: 44px; min-width: 56px; font-size: 13px; }
+  .facts-dots button { width: 12px; height: 12px; }
+  .chip { padding: 5px 11px; font-size: 12px; }
+  .chip a { display: inline-block; padding: 2px 0; }
+}
+
 /* ---------------- footer ---------------- */
 
 .foot {
