@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+.vercel
+*.tsbuildinfo
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env
+.env
+.env*.local
+
+# research scratch (keep the scripts + findings, drop bulk fetch artifacts)
+research/*.html
+research/chunk_*.js
+research/hr.js
+research/rw.js
+research/sa.js
+research/*.output
+research/extract_results.json
+research/extract2_results.json
+research/playlist_tier.json

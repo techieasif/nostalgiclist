@@ -1,0 +1,81 @@
+# nostalgiclist
+
+A directory of the desi-nostalgia web — the wave of sites that recreate a 90s Indian barber shop,
+a Haryana Roadways bus, a qawwali mehfil — with a button that turns any of them into a **real
+playlist on your phone**, with no login and no API key.
+
+18 sites · 549 validated songs.
+
+```bash
+cd app && npm install && npm run dev     # http://localhost:3311
+```
+
+## How it works
+
+**Extraction** (`research/build_catalog.py`, run offline) walks each site and pulls its tracklist
+using only keyless endpoints:
+
+| Tier | Method | Sites |
+|---|---|---|
+| T1 | key-driven regex — `"youtubeId"\|"videoId"\|"ytId"\|"id": "<11 chars>"` over HTML + JS bundles | 10/27 |
+| T2 | YouTube playlist scrape — `youtube.com/playlist?list=<id>` → `"videoId"` | 15/27 |
+| — | **union, no API keys** | **21/27 = 77%** |
+
+Every candidate id is then validated through **YouTube oEmbed** (keyless, no Data API quota),
+which both filters false positives and returns the title and channel for free.
+
+**Playlist building** (`app/app/api/playlist/route.ts`) posts the ids to YouTube's undocumented
+`watch_videos` endpoint and reads the playlist id out of the redirect. No OAuth, no quota, no
+Google Cloud project.
+
+## Things that will bite you
+
+These are all verified empirically — none are documented by Google.
+
+- **A bare 11-char regex does not work.** It returned 1,788 candidates on one site of which
+  *zero* were real videos. `BatchedMesh`, `modelMatrix`, `currentTime` are all exactly 11
+  characters. Always validate. Same trap for playlist ids: `PLACEMENTMAP` and
+  `PLAY_P3_TO_LINEAR_SRGB` are Three.js constants.
+- **`watch_videos` caps at 50 ids** and silently truncates — 50 ids and 52 ids return the *same*
+  playlist.
+- **One bad id destroys the whole playlist.** YouTube drops the `&list=` param entirely and
+  redirects to a single bare video. This is why every id is pre-validated at build time.
+- **The returned `TLGG…` id is date-encoded and rotates daily** (`…MTA4MjAyNg` → `1082026`), so
+  the API caches per-day.
+- **YouTube Music cannot open `watch_videos` playlists.** A `TLGG` id renders 0 tracks with
+  `<title>undefined</title>` there — identical to a garbage id — while a real `PL` id renders
+  fine. HTTP status is 200 either way, so *assert on content, not status*. The YT Music button
+  therefore appears only for the 12 sites that publish their own `PL` playlist; all 12 verified.
+
+## Why only YouTube
+
+- **Spotify** caps apps created today at **5 users**, and the app owner must hold Premium.
+  Extended quota needs a registered business at 250k+ MAU.
+- **Apple Music** needs a $99/yr developer membership *and* an active user subscription.
+
+Both can still be deep-linked per song via the keyless iTunes Search API — that's the v1 plan.
+Full analysis in [`research/FEASIBILITY.md`](research/FEASIBILITY.md).
+
+## Credit
+
+Every site here was made by someone else, on their own time, in the space of about a week.
+Each card links to the original — go tell them.
+
+## Layout
+
+```
+app/                     Next.js 15 app
+  app/page.tsx           directory
+  app/SiteCard.tsx       per-site card + build button
+  app/api/playlist/      watch_videos resolver (50-chunk, daily cache)
+  data/catalog.json      generated — do not hand-edit
+research/
+  build_catalog.py       the extractor that generates catalog.json
+  FEASIBILITY.md         platform-by-platform analysis
+  VERIFIED_FINDINGS.md   raw measurements
+  extract.py             spike 1 — hardcoded key order, 11% coverage
+  extract2.py            spike 2 — key-name driven, 37%
+  tier_playlist.py       spike 3 — playlist scrape, the jump to 77%
+```
+
+Refresh the catalog with `python3 research/build_catalog.py`.
