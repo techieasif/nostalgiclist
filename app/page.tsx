@@ -1,5 +1,6 @@
 import catalog from "@/data/catalog.json";
 import SiteCard, { type Site } from "./SiteCard";
+import Facts from "./Facts";
 
 export default function Home() {
   const sites = catalog.sites as Site[];
@@ -32,16 +33,7 @@ export default function Home() {
           <strong>{sites.length} sites · {songs} songs</strong> — every one made by
           someone else. Tap through and go tell them.
         </p>
-        <p>
-          Playlists are built with YouTube&rsquo;s anonymous playlist endpoint — no
-          account, no API key, nothing stored about you. Where a site publishes its
-          own YouTube playlist, you get a YouTube&nbsp;Music link too; YT&nbsp;Music
-          can&rsquo;t open the temporary kind.
-        </p>
-        <p style={{ opacity: 0.75 }}>
-          Spotify caps new apps at 5 users and Apple Music needs a $99/yr developer
-          account, so those buttons aren&rsquo;t here rather than here and broken.
-        </p>
+        <Facts />
       </footer>
     </main>
   );
